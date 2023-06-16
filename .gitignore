@@ -1,3 +1,7 @@
+cert-pinning-bypass/data/apks
+*.db-shm
+*.db-wal
+
 tmp/
 *.tmp
 tmp.*

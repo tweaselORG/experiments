@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "packages": {
+    "cyanoacrylate": {
+      "signature": "3639deb60b60d41daf47d48edb837540",
+      "file": true,
+      "replaced": "^0.6.3"
+    },
+    "appstraction": {
+      "signature": "bab381d81faaace8c11971f151f8c46d",
+      "file": true,
+      "replaced": "^0.4.3"
+    }
+  }
+}
