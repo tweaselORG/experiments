@@ -37,59 +37,64 @@ const db = sqlite3(join('data', 'results.db'));
     await analysis.ensureDevice();
 
     for (const app of apps) {
-        const appMeta = await parseAppMeta(app as `${string}.apk`);
-        for (const method of ['none', 'objection', 'httptoolkit']) {
-            if (checkStmt.get(appMeta!.id, method)) {
-                console.log(`Already analyzed ${appMeta!.id} (method: ${method}).`);
-                continue;
+        try {
+            const appMeta = await parseAppMeta(app as `${string}.apk`);
+            for (const method of ['none', 'objection', 'httptoolkit']) {
+                if (checkStmt.get(appMeta!.id, method)) {
+                    console.log(`Already analyzed ${appMeta!.id} (method: ${method}).`);
+                    continue;
+                }
+                console.log(`Analyzing ${appMeta!.id} (method: ${method})...`);
+
+                await analysis.ensureTrackingDomainResolution();
+
+                const appAnalysis = await analysis.startAppAnalysis(app);
+                await appAnalysis.uninstallApp();
+                await appAnalysis.installApp();
+                await appAnalysis.setAppPermissions();
+                await appAnalysis.startTrafficCollection('main');
+
+                let startProcess: ExecaChildProcess<string> | undefined;
+                if (method === 'none') await appAnalysis.startApp();
+                else if (method === 'objection')
+                    startProcess = python('objection', [
+                        '--gadget',
+                        appAnalysis.app.id,
+                        'explore',
+                        '--startup-command',
+                        'android sslpinning disable',
+                    ]);
+                else if (method === 'httptoolkit')
+                    startProcess = python('frida', [
+                        '-U',
+                        '-f',
+                        appAnalysis.app.id,
+                        '-l',
+                        join('external', 'httptoolkit-script.js'),
+                    ]);
+
+                await pause(60_000);
+                const appCrashed = (await analysis.platform.getForegroundAppId()) !== appAnalysis.app.id;
+
+                await appAnalysis.stopTrafficCollection();
+                if (startProcess) killProcess(startProcess);
+                await appAnalysis.uninstallApp();
+
+                const res = await appAnalysis.stop();
+                insertStmt.run(
+                    res.app.id,
+                    res.app.version || 'unknown',
+                    method,
+                    res.traffic['main'].log.entries.length,
+                    JSON.stringify(res.mitmproxyEvents.filter((e) => e.status === 'tlsFailed')),
+                    appCrashed ? 1 : 0
+                );
             }
-            console.log(`Analyzing ${appMeta!.id} (method: ${method})...`);
-
-            await analysis.ensureTrackingDomainResolution();
-
-            const appAnalysis = await analysis.startAppAnalysis(app);
-            await appAnalysis.uninstallApp();
-            await appAnalysis.installApp();
-            await appAnalysis.setAppPermissions();
-            await appAnalysis.startTrafficCollection('main');
-
-            let startProcess: ExecaChildProcess<string> | undefined;
-            if (method === 'none') await appAnalysis.startApp();
-            else if (method === 'objection')
-                startProcess = python('objection', [
-                    '--gadget',
-                    appAnalysis.app.id,
-                    'explore',
-                    '--startup-command',
-                    'android sslpinning disable',
-                ]);
-            else if (method === 'httptoolkit')
-                startProcess = python('frida', [
-                    '-U',
-                    '-f',
-                    appAnalysis.app.id,
-                    '-l',
-                    join('external', 'httptoolkit-script.js'),
-                ]);
-
-            await pause(60_000);
-            const appCrashed = (await analysis.platform.getForegroundAppId()) !== appAnalysis.app.id;
-
-            await appAnalysis.stopTrafficCollection();
-            if (startProcess) killProcess(startProcess);
-            await appAnalysis.uninstallApp();
-
-            const res = await appAnalysis.stop();
-            insertStmt.run(
-                res.app.id,
-                res.app.version || 'unknown',
-                method,
-                res.traffic['main'].log.entries.length,
-                JSON.stringify(res.mitmproxyEvents.filter((e) => e.status === 'tlsFailed')),
-                appCrashed ? 1 : 0
-            );
+            console.log();
+        } catch (err) {
+            console.error(`Failed to analyze app ${app}:`, err);
+            console.log();
         }
-        console.log();
     }
 
     await analysis.stop();
