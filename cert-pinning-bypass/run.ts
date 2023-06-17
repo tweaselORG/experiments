@@ -7,6 +7,9 @@ import { ExecaChildProcess } from 'execa';
 import { parseAppMeta } from 'appstraction';
 import { killProcess } from './util';
 
+const apkDir = process.argv[2];
+if (!apkDir) throw new Error('You need to provide the path that holds the APKs as the only argument.');
+
 const db = sqlite3(join('data', 'results.db'));
 
 (async () => {
@@ -32,7 +35,7 @@ const db = sqlite3(join('data', 'results.db'));
         runTarget: 'device',
         capabilities: ['frida'],
     });
-    const apps = (await fse.readdir('data/apks')).map((f) => join('data/apks', f));
+    const apps = (await fse.readdir(apkDir)).map((f) => join(apkDir, f));
 
     await analysis.ensureDevice();
 
@@ -73,7 +76,7 @@ const db = sqlite3(join('data', 'results.db'));
                         join('external', 'httptoolkit-script.js'),
                     ]);
 
-                await pause(60_000);
+                await pause(30_000);
                 const appCrashed = (await analysis.platform.getForegroundAppId()) !== appAnalysis.app.id;
 
                 await appAnalysis.stopTrafficCollection();
