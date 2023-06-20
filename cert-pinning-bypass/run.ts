@@ -97,6 +97,9 @@ const db = sqlite3(join('data', 'results.db'));
         } catch (err) {
             console.error(`Failed to analyze app ${app}:`, err);
             console.log();
+
+            const appMeta = await parseAppMeta(app as `${string}.apk`);
+            await analysis.platform.uninstallApp(appMeta?.id!);
         }
     }
 
