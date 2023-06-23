@@ -25,7 +25,7 @@ WHERE appId NOT IN (
 
     for (const error of [
         'The client disconnected during the handshake',
-        "The client does not trust the proxy''s certificate",
+        "The client does not trust the proxy''s certificate for",
         'connection closed early',
         'Client and mitmproxy cannot agree on a TLS version to use',
     ]) {
