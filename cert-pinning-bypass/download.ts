@@ -23,10 +23,10 @@ if (!apkDir) throw new Error('You need to provide the output path for the APKs a
         try {
             await execa('googleplay', ['-d', appId, '-purchase']);
 
-            const { stdout: appDetails } = await execa('googleplay', ['-d', appId]);
+            const { stdout: appDetails } = await execa('googleplay', ['-d', appId, '-p', '2']);
             const versionCode = appDetails.match(/version code: (.+)$/)![1];
 
-            await execa('googleplay', ['-d', appId, '-v', versionCode, '-s'], { cwd: apkDir });
+            await execa('googleplay', ['-d', appId, '-v', versionCode, '-s', '-p', '2'], { cwd: apkDir });
 
             console.log(`Downloaded ${appId}.`);
         } catch (e) {
