@@ -74,34 +74,54 @@ WHERE appId NOT IN (
         }))
         .map((r) => ({
             ...r,
-            domainsWithTlsError: new Set(r.tlsErrors.map((e) => e.serverDomain).filter((d) => !!d)),
+            domainsWithUntrustedCertificate: new Set(
+                r.tlsErrors
+                    // As per https://github.com/tweaselORG/meta/issues/16#issuecomment-1604533549, "The client does not
+                    // trust the proxy's certificate for" is the only error related to certificate pinning.
+                    .filter((e) => e.context.error.includes("The client does not trust the proxy's certificate for"))
+                    .map((e) => e.serverDomain)
+                    .filter((d) => !!d)
+            ),
         }));
 
-    const domainsWithTlsErrorWithoutBypass = new Set(
-        runs
-            .filter((r) => r.method !== 'none')
-            .flatMap((r) => r.tlsErrors)
-            .map((e) => e.serverDomain)
-            .filter((d) => !!d)
+    const domainsWithUntrustedCertificateWithoutBypass = new Set(
+        runs.filter((r) => r.method === 'none').flatMap((r) => Array.from(r.domainsWithUntrustedCertificate))
     );
-    console.log('Domains with TLS error without bypass:', domainsWithTlsErrorWithoutBypass);
+    console.log('Domains with untrusted certificate without bypass:', domainsWithUntrustedCertificateWithoutBypass);
+    const unsolvedDomains = new Set(
+        runs.filter((r) => r.method !== 'none').flatMap((r) => Array.from(r.domainsWithUntrustedCertificate))
+    );
+    console.log('Unsolved domains despite bypass (for either script):', unsolvedDomains);
 
     const solvedDomains = {
         objection: new Set<string>(),
         httptoolkit: new Set<string>(),
     };
     for (const run of runs) {
-        if (run.method === 'none' || run.tlsErrors.length === 0) continue;
+        if (run.method === 'none') continue;
 
         const runForNone = runs.find((r) => r.appId === run.appId && r.method === 'none');
         if (!runForNone) throw new Error(`No run for none found for ${run.appId}. That should never happen.`);
 
-        for (const domain of run.domainsWithTlsError) {
-            if (runForNone.domainsWithTlsError.has(domain)) solvedDomains[run.method].add(domain);
+        for (const domain of runForNone.domainsWithUntrustedCertificate) {
+            if (!run.domainsWithUntrustedCertificate.has(domain)) solvedDomains[run.method].add(domain);
         }
     }
 
-    console.log('Solved domains per method:', solvedDomains);
+    const compareSets = <T>(a: Set<T>, b: Set<T>) => {
+        const added = [...b].filter((x) => !a.has(x));
+        const removed = [...a].filter((x) => !b.has(x));
+        return { added, removed };
+    };
+
+    console.log('Solved domains per method:', {
+        objection: solvedDomains.objection.size,
+        httptoolkit: solvedDomains.httptoolkit.size,
+    });
+    console.log(
+        'Comparing solved domains between objection and httptoolkit:',
+        compareSets(solvedDomains.objection, solvedDomains.httptoolkit)
+    );
 })();
 
 process.on('exit', () => db.close());
