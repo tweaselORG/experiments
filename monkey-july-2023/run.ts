@@ -2,6 +2,7 @@ import { pause, startAnalysis } from 'cyanoacrylate';
 import fse from 'fs-extra';
 import { join } from 'path';
 import { execa } from 'execa';
+import arrayShuffle from 'array-shuffle';
 import type { ExecaChildProcess } from 'execa';
 import { parseAppMeta } from 'appstraction';
 import { killProcess } from './util';
@@ -30,7 +31,7 @@ if (platform === 'ios' && !proxyIp) throw new Error('On iOS, you need to provide
     });
     const apps = (await fse.readdir(appDir)).map((f) => join(appDir, f));
 
-    for (const app of apps) {
+    for (const app of arrayShuffle(apps)) {
         try {
             const appMeta = await parseAppMeta(app as `${string}.apk`);
 
