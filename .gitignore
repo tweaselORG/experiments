@@ -8,6 +8,9 @@ tmp.*
 
 dist/
 
+monkey-july-2023/data/results-android
+monkey-july-2023/data/results-ios
+
 # Created by https://www.toptal.com/developers/gitignore/api/linux,macos,windows,visualstudiocode,jetbrains+all,sublimetext,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=linux,macos,windows,visualstudiocode,jetbrains+all,sublimetext,node
 

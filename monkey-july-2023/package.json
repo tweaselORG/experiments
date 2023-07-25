@@ -1,0 +1,24 @@
+{
+    "name": "monkey-july-2023",
+    "version": "0.0.0",
+    "main": "index.js",
+    "author": "Benjamin Altpeter <hi@bn.al>",
+    "license": "MIT",
+    "type": "module",
+    "dependencies": {
+        "andromatic": "^1.1.1",
+        "appstraction": "^1.0.0",
+        "array-shuffle": "^3.0.0",
+        "cyanoacrylate": "^1.0.0",
+        "execa": "^7.1.1",
+        "fs-extra": "^11.1.1",
+        "p-map": "^6.0.0",
+        "p-timeout": "^6.1.2",
+        "parse-play": "^2.1.0",
+        "parse-tunes": "^1.0.1",
+        "strip-ansi": "^7.1.0"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "^11.0.1"
+    }
+}
