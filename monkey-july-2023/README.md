@@ -1,4 +1,4 @@
-# Traffic collection for TrackHAR adapter work (with monkey on Android)
+# Traffic collection for TrackHAR adapter work July 2023 (with monkey on Android)
 
 Issue thread: https://github.com/tweaselORG/experiments/issues/1
 
