@@ -18,7 +18,7 @@ const dataDir = process.argv[3];
 if (!urlListFile || !dataDir)
     throw new Error('You need to provide the paths to the URL list as well as the data directory as the arguments.');
 
-const runTypes = ['monkey', 'no-interaction'] as const;
+const runTypes = ['no-interaction', 'monkey'] as const;
 
 (async () => {
     for (const runType of runTypes) await ensureDir(join(dataDir, runType));
@@ -72,7 +72,7 @@ const runTypes = ['monkey', 'no-interaction'] as const;
         await writeFile(metaFile, JSON.stringify({ url, startedDate, stoppedDate }, null, 4));
     };
 
-    const jobParams = arrayShuffle(urls).flatMap((url) => runTypes.map((r) => [url, r] as const));
+    const jobParams = runTypes.flatMap((r) => arrayShuffle(urls).map((url) => [url, r] as const));
 
     await pMap(jobParams, run, { concurrency, stopOnError: false }).catch(() => 1);
 
