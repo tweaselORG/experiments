@@ -14,6 +14,7 @@ monkey-july-2023/data/monkey-july-2023.db
 monkey-april-2024/data/monkey-april-2024.db
 monkey-april-2024/data/results-android
 web-monkey-september-2024/data/results
+web-monkey-september-2024/data/web-monkey-september-2024.db
 
 # Created by https://www.toptal.com/developers/gitignore/api/linux,macos,windows,visualstudiocode,jetbrains+all,sublimetext,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=linux,macos,windows,visualstudiocode,jetbrains+all,sublimetext,node
