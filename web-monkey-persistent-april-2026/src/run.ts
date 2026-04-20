@@ -11,6 +11,7 @@ const headless = !process.env.HEADED;
 const concurrency = process.env.CONCURRENCY ? +process.env.CONCURRENCY : 3;
 const timeout = process.env.TIMEOUT ? +process.env.TIMEOUT : 60_000;
 const monkeyActionDelay = process.env.MONKEY_ACTION_DELAY ? +process.env.MONKEY_ACTION_DELAY : 150;
+const proxy = process.env.PROXY;
 
 const urlListFile = process.argv[2];
 const dataDir = process.argv[3];
@@ -29,8 +30,9 @@ const monkeyTimeout = timeout * 0.75;
         colorScheme: 'dark',
         geolocation: { longitude: 10.5232356, latitude: 52.2723916 },
         locale: 'de-DE',
-
         timezoneId: 'Europe/Berlin',
+
+        ...(proxy && { proxy: { server: proxy } }),
     });
 
     const run = async (url: string) => {
