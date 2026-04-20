@@ -1,0 +1,22 @@
+{
+  "name": "web-monkey-persistent-april-2026",
+  "version": "0.0.0",
+  "main": "index.js",
+  "author": "Benjamin Altpeter <hi@bn.al>",
+  "license": "MIT",
+  "dependencies": {
+    "@playwright/browser-chromium": "^1.59.1",
+    "@sindresorhus/slugify": "^3.0.0",
+    "array-shuffle": "^4.1.0",
+    "better-sqlite3": "^12.9.0",
+    "fs-extra": "^11.3.4",
+    "globby": "14.0.2",
+    "p-map": "^7.0.4",
+    "playwright": "1.60.0-alpha-2026-04-20"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.6.0"
+  }
+}
