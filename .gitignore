@@ -17,6 +17,7 @@ web-monkey-september-2024/data/results
 web-monkey-september-2024/data/web-monkey-september-2024.db
 web-monkey-persistent-april-2026/data/results
 web-monkey-persistent-april-2026/data/web-monkey-persistent-april-2026.db
+web-monkey-persistent-april-2026/storage-state.json
 
 # Created by https://www.toptal.com/developers/gitignore/api/linux,macos,windows,visualstudiocode,jetbrains+all,sublimetext,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=linux,macos,windows,visualstudiocode,jetbrains+all,sublimetext,node
